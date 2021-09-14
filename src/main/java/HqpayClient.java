@@ -1,6 +1,9 @@
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -12,10 +15,8 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class HqpayClient {
     private final String appId;
@@ -62,12 +63,12 @@ public class HqpayClient {
     private String execute(String path,  Object o) throws Exception {
         HttpUriRequest httpRequest = RequestBuilder.create("POST")
                 .setUri(new URIBuilder(host).setPathSegments("business-platform.web.services.merchant-api-v3", "rest", "api", "v3", path).build())
-                .setEntity(new StringEntity(objectMapper.writeValueAsString(o)))
+                .setEntity(new StringEntity(objectMapper.writeValueAsString(o),Charset.forName("UTF-8")))
                 .build();
         httpRequest.setHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
         httpRequest.setHeader(new BasicHeader(HttpHeaders.AUTHORIZATION, secret));
         httpRequest.setHeader(new BasicHeader("AppId", appId));
-        return EntityUtils.toString(httpClient.execute(httpRequest).getEntity());
+        return EntityUtils.toString(httpClient.execute(httpRequest).getEntity(),"UTF-8");
     }
 
 
